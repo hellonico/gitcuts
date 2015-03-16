@@ -1,0 +1,19 @@
+LAST_COMMIT=` git log -n 1 --pretty=format:"%H" `
+MERGE_ID=${1-$LAST_COMMIT}
+
+# back to known state
+git reset --hard HEAD
+
+echo "Git diff on merge : $MERGE_ID"
+ID1=`git show $MERGE_ID | sed -n 2p  | awk '{print $2 }'  `
+ID2=`git show $MERGE_ID | sed -n 2p  | awk '{print $3 }'  `
+git diff $ID1 $ID2 --name-only .
+
+echo "Need to be reverted (y/n)? "
+read answer
+if echo "$answer" | grep -iq "^y" ;then
+	echo "Creating reverse commit ..."
+	git revert -m 1 $MERGE_ID    
+else
+    echo "Back to sleep"
+fi

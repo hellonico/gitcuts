@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "Reset last merge"
+git reset --merge ORIG_HEAD

@@ -1,0 +1,34 @@
+export BRANCH=$1
+export BASE_BRANCH=feature/ph4.0
+echo "Merging $BRANCH"
+
+# Checkout base branch
+git checkout $BASE_BRANCH
+# Put the branch in sync with remote
+git reset --hard origin/$BASE_BRANCH
+# fetch all changes from origin
+git pull origin 
+
+# Delete the branch if it exist locally
+if [ `git branch --list $BRANCH `]
+then
+   echo "Branch name $BRANCH already exists. Deleting..."
+   git branch -d $BRANCH
+fi
+
+# checkout the branch to be merged
+git checkout -b $1 origin/$1
+# go back to base branch and merge
+git checkout $BASE_BRANCH
+git merge --no-ff $1
+
+# ask to check for the result and push if needed.
+echo "Is this merge ok  (y/n)? "
+read answer
+if echo "$answer" | grep -iq "^y" ;then
+    echo "Pushing to remote..."
+    git push origin $BASE_BRANCH
+    echo "Merged with ` git log -n 1 --pretty=format:"%H"  `"
+else
+    echo "Aborting..."
+fi
